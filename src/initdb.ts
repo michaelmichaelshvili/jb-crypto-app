@@ -30,7 +30,8 @@ const query = util.promisify(connection.query).bind(connection);
             id int auto_increment,
             user_id int not null,
             symbol varchar(3) not null,
-            primary key (id)
+            primary key (id),
+            CONSTRAINT unique_user_id_symbol UNIQUE (user_id,symbol)
             )
             `);
         console.log("created table users_symbols!");

@@ -29,7 +29,7 @@ class UserSymbol implements Model {
 
     public async add(userSymbol: DTO): Promise<DTO> {
         const result: OkPacketParams = await query(`
-            INSERT INTO user_symbols(user_id, symbol) 
+            INSERT INTO users_symbols(user_id, symbol) 
             VALUES(?,?) 
         `, [userSymbol.userId, userSymbol.symbol]);
         if (!result.insertId) throw new Error('error inserting')
