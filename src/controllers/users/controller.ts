@@ -1,11 +1,17 @@
 import { NextFunction, Request, Response } from "express";
-import getModel from "../../models/user-symbol/factory";
+import getUserSymbolModel from "../../models/user-symbol/factory";
+import getSymbolValueModel from "../../models/symbol-value/factory";
 
 export async function dashboard(req: Request, res: Response, next: NextFunction) {
     try {
-        const userSymbols = await getModel().getByUser(1)
+        const userSymbols = await getUserSymbolModel().getByUser(1)
+        const symbolsValues = await Promise.all(userSymbols.map(userSymbol =>
+            getSymbolValueModel().getLatest(userSymbol.symbol)
+        ))
+
         res.render('users/dashboard', {
-            userSymbols
+            userSymbols,
+            symbolsValues
         })
     } catch (err) {
         next(err)
@@ -14,7 +20,7 @@ export async function dashboard(req: Request, res: Response, next: NextFunction)
 
 export async function addSymbol(req: Request, res: Response, next: NextFunction) {
     try {
-        const userSymbolModel = getModel()
+        const userSymbolModel = getUserSymbolModel()
         const newUserSymbol = await userSymbolModel.add({ ...req.body, userId: 1 })
         console.log(`new user-symbol added with id ${newUserSymbol.id}`);
 

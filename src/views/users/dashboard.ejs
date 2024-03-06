@@ -29,7 +29,9 @@
                     <td>
                         <%= userSymbol.symbol %>
                     </td>
-                    <td></td>
+                    <td>
+                        <%= symbolsValues.find(symbolValue=>symbolValue?.symbol === userSymbol.symbol)?.value %>
+                    </td>
                 </tr>
                 <%}) %>
         </tbody>

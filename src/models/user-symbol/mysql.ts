@@ -18,6 +18,11 @@ class UserSymbol implements Model {
         SELECT * FROM users_symbols WHERE user_id=?`, [userId])
     }
 
+    async getUniqueSymbols(): Promise<string[]> {
+        const userSymbols = await query(`SELECT DISTINCT symbol FROM users_symbols`)
+        return userSymbols.map(symbol => symbol.symbol)
+    }
+
 }
 
 const userSymbol = new UserSymbol();
