@@ -6,10 +6,15 @@ import getUserSymbolModel from './models/user-symbol/factory';
 import getSymbolValueModel from './models/symbol-value/factory';
 import axios from 'axios';
 import Cheerio from 'cheerio';
+import { io } from 'socket.io-client';
+
+
 //db connection
-const connection = mysql.createConnection(config.get("mysql"));
-const connect = util.promisify(connection.connect).bind(connection);
-const query = util.promisify(connection.query).bind(connection);
+// const connection = mysql.createConnection(config.get("mysql"));
+// const connect = util.promisify(connection.connect).bind(connection);
+// const query = util.promisify(connection.query).bind(connection);
+
+const socket = io(`ws://${config.get<string>('worker.io.host')}:${config.get<number>('worker.io.port')}`)
 
 
 async function scrape(symbol: string) {
@@ -24,7 +29,8 @@ async function scrape(symbol: string) {
         value,
         when: new Date()
     })
-    return value
+    socket.emit('update from worker', { symbol, value })
+    return
 }
 
 //worker job

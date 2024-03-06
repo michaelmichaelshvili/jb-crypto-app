@@ -5,6 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CryptoApp Dashboard</title>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"
+        integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4"
+        crossorigin="anonymous"></script>
+    <script>
+        const socket = io('ws://<%= io.host%>:<%= io.port%>')
+        socket.on('update your list', message => {
+            console.log(`received an 'update your list' message:`, message)  
+            document.getElementById(`${message.symbol}-value`).innerHTML = message.value
+        })
+    </script>
 </head>
 
 <body>
@@ -29,7 +39,7 @@
                     <td>
                         <%= userSymbol.symbol %>
                     </td>
-                    <td>
+                    <td id="<%= userSymbol.symbol%>-value">
                         <%= symbolsValues.find(symbolValue=>symbolValue?.symbol === userSymbol.symbol)?.value %>
                     </td>
                 </tr>
