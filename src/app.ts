@@ -1,10 +1,21 @@
 import express, { urlencoded } from "express";
 import userRouter from "./routers/users";
+import guestsRouter from "./routers/guests";
+import githubRouter from "./routers/github";
 import path from "path";
 import config from 'config'
 import errorHandler from "./middlewares/error/error-handler";
 import session from "express-session";
 import auth from './middlewares/github-auth'
+
+declare global{
+    namespace Express{
+        interface User{
+            id: number
+        }
+    }
+}
+
 
 const server = express()
 
@@ -25,7 +36,10 @@ server.use(auth.session())
 
 //general middlewares
 server.use(urlencoded())
+server.use('/', guestsRouter)
 server.use('/users', userRouter)
+server.use('/github', githubRouter)
+
 
 //errors middlewares
 server.use(errorHandler)

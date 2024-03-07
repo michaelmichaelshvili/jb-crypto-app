@@ -3,9 +3,10 @@ import getUserSymbolModel from "../../models/user-symbol/factory";
 import getSymbolValueModel from "../../models/symbol-value/factory";
 import config from 'config'
 
+
 export async function dashboard(req: Request, res: Response, next: NextFunction) {
     try {
-        const userSymbols = await getUserSymbolModel().getByUser(1)
+        const userSymbols = await getUserSymbolModel().getByUser(req.user.id)
         const symbolsValues = await Promise.all(userSymbols.map(userSymbol =>
             getSymbolValueModel().getLatest(userSymbol.symbol)
         ))
@@ -23,11 +24,17 @@ export async function dashboard(req: Request, res: Response, next: NextFunction)
 export async function addSymbol(req: Request, res: Response, next: NextFunction) {
     try {
         const userSymbolModel = getUserSymbolModel()
-        const newUserSymbol = await userSymbolModel.add({ ...req.body, userId: 1 })
+        const newUserSymbol = await userSymbolModel.add({ ...req.body, userId: req.user.id })
         console.log(`new user-symbol added with id ${newUserSymbol.id}`);
 
         res.redirect('/users/dashboard')
     } catch (err) {
         next(err)
     }
+}
+
+export function logout(req: Request, res: Response, next: NextFunction){
+    req.logout(()=>{
+        res.redirect('/')
+    })
 }

@@ -1,27 +1,31 @@
-import passport from "passport";
-import { Strategy } from 'passport-github2';
+import passport, { use } from "passport";
+import { Profile, Strategy } from 'passport-github2';
 import config from 'config'
+import getUserModel from "../models/user/factory";
 
 passport.serializeUser((user, done) => {
     done(null, user);
 });
 
-passport.deserializeUser((user, done) => {
+passport.deserializeUser((user: Express.User, done) => {
     done(null, user);
 });
 
-passport.use(new Strategy(config.get('github'),
-    async (email, password, done) => {
+passport.use(new Strategy(
+    { ...config.get('github') },
+    async function (accessToken, refreshToken, profile, done) {
         try {
-            // try to fetch the user from the database
-            // according to the user input
-
-
-            // if we did find a user in the database, inform passport about it
-            return done(null);
+            const githubId = profile.id
+            let user = await getUserModel().get(githubId)
+            if (!user) {
+                user = await getUserModel().signup({ githubId })
+            }
+            if (!user) {
+                return done(null, false)
+            }
+            return done(null, user)
         } catch (err) {
-            // if any error occurred in the process, inform passport about it
-            return done(err);
+            done(err)
         }
     }
 ));
